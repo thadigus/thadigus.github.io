@@ -1,9 +1,48 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta http-equiv="refresh" content="0; url='https://thadturner.com/'" />
-  </head>
-  <body>
-    <p><a href="https://thadturner.com/">Redirect</a></p>
-  </body>
-</html>
+---
+title: "Thad Turner - IT Systems Administrator"
+layout: splash
+header:
+  overlay_color: "#000"
+  overlay_filter: "0.5"
+  overlay_image: /assets/images/keyboard-home-lab.jpg
+  actions:
+    - label: "About Me"
+      url: "/about/"
+excerpt: "IT operations is a game of problem solving. By constantly taking on new challenges we can find better solutions for the issues we interact with every single day."
+feature_row:
+  - image_path: /assets/images/2025-02-26-Trickster-HTB-Writeup/Trickster-HTB-Image.png
+    alt: "Trickster HTB Writeup"
+    title: "Trickster HTB Writeup"
+    excerpt: "Trickster is a medium level box that involves web exploitation and unnecessary deployment artifacts in the form of Git repository hidden files in the web root. From there source code is revealed allowing the attacker to access a hidden admin panel which leads to exploitation of PrestaShop with CVE-2024-34716."
+    url: "/htb-writeups/2025-02-26-Trickster-HTB-Writeup/"
+    btn_label: "Read More"
+    btn_class: "btn--primary"
+  - image_path: /assets/images/2025-01-17-Compiled-HTB-Writeup/Compiled-HTB-Image.png
+    alt: "Compiled HTB Writeup"
+    title: "Compiled HTB Writeup"
+    excerpt: "Compiled is a medium level Windows machine on HackTheBox that features exploitation in Git in order to create a file system symlink that allows an attacker to perform remote code execution on users that clone the malicious repository through malicious hooks."
+    url: "/htb-writeups/2025-01-17-Compiled-HTB-Writeup/"
+    btn_label: "Read More"
+    btn_class: "btn--primary"
+  - image_path: /assets/images/2024-01-29-Blackfield-HTB-Writeup/Blackfield-HTB-Image.png
+    alt: "Blackfield HTB Writeup"
+    title: "Blackfield HTB Writeup"
+    excerpt: "Blackfield is a Hard rated box from HackTheBox. It features a fairly common exploitation path for Windows Active Directory. In this guide we will freshen up on our use of AS-REP roasting and bloodhound."
+    url: "/htb-writeups/2024-01-29-Blackfield-HTB-Writeup/"
+    btn_label: "Read More"
+    btn_class: "btn--primary"
+feature_row2:
+  - image_path: /assets/images/2022-06-05-Overview-Home-Lab/rack-home-lab.jpg
+    alt: "Turner Services Home Lab"
+    title: "Homelab Overview"
+    excerpt: "A home lab is an excellent way to learn about new technologies in a safe environment. I utilize my home lab to learn Infrastructure as Code, Python development, cybersecurity work, and Ethical Hacking. The home lab section of this site will detail projects and technologies that I learn along the way."
+    url: "/project-posts/"
+    btn_label: "Checkout My Latest Projects"
+    btn_class: "btn--primary"
+---
+
+{% include feature_row id="intro" type="center" %}
+
+{% include feature_row %}
+
+{% include feature_row id="feature_row2" type="left" %}

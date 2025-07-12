@@ -9,7 +9,7 @@ name                     : "Thad Turner"
 description              : "Ethical hacking, infrastructure, operations, and automation for the future."
 url                      : "https://thadturner.com/"
 baseurl                  : ""
-repository               : "thadigus/thadigus.gitlab.io"
+repository               : "thadigus/thadigus.github.io"
 teaser                   : "/assets/images/tt_logo.png"
 logo                     : "/assets/images/tt_logo.png"
 masthead_title           : # overrides the website title displayed in the masthead, use " " for no title

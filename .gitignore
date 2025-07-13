@@ -22,7 +22,6 @@ codekit-config.json
 .DS_Store
 
 # VS Code
-.devcontainer
 .vscode
 
 # Jekyll generated files

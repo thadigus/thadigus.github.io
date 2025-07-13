@@ -1,0 +1,12 @@
+{
+  "name": "Thadigus Blog Site Devcontainer",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "settings": {
+    "terminal.integrated.shell.linux": "/bin/bash"
+  },
+  "forwardPorts": [4000],
+  "postCreateCommand": "bundle install",
+  "remoteUser": "root"
+}

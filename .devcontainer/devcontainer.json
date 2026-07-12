@@ -1,12 +1,19 @@
 {
   "name": "Thadigus Blog Site Devcontainer",
+  "workspaceFolder": "/workspaces/thadigus.github.io",
   "build": {
-    "dockerfile": "Dockerfile"
+    "dockerfile": "Dockerfile",
+    "context": ".."
   },
-  "settings": {
-    "terminal.integrated.shell.linux": "/bin/bash"
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "terminal.integrated.shell.linux": "/bin/bash",
+        "terminal.integrated.cwd": "/workspaces/thadigus.github.io"
+      }
+    }
   },
   "forwardPorts": [4000],
-  "postCreateCommand": "bundle install",
+  "postCreateCommand": "git config --global --add safe.directory /workspaces/thadigus.github.io && bundle install",
   "remoteUser": "root"
 }

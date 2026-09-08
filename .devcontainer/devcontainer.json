@@ -1,0 +1,19 @@
+{
+  "name": "Thadigus Blog Site Devcontainer",
+  "workspaceFolder": "/workspaces/thadigus-blog",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "terminal.integrated.shell.linux": "/bin/bash",
+        "terminal.integrated.cwd": "/workspaces/thadigus-blog"
+      }
+    }
+  },
+  "appPort": [4000, 35729],
+  "postCreateCommand": "git config --global --add safe.directory /workspaces/thadigus.github.io && bundle exec jekyll serve -H 0.0.0.0 --port 4000 --livereload",
+  "remoteUser": "root"
+}

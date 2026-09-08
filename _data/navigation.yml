@@ -1,0 +1,10 @@
+# main links
+main:
+  - title: "HF Propagation"
+    url: /hf-prop/
+  - title: "CTF Writeups"
+    url: /htb-writeups/
+  - title: "Project Posts"
+    url: /project-posts/
+  - title: "About"
+    url: /about/

@@ -1,0 +1,74 @@
+{% assign articles = "" | split: "" %}
+{% for coll in site.collections %}
+  {% if coll.output %}
+    {% assign articles = articles | concat: coll.docs %}
+  {% endif %}
+{% endfor %}
+{% assign articles = articles | sort: "date" | reverse %}
+
+<div class="feature__wrapper">
+  {% for article in articles limit: include.limit %}
+    <div class="feature__item">
+      <div class="archive__item">
+
+        {% assign candidates = "" | split: "" %}
+        {% if article.teaser %}
+          {% assign candidates = candidates | push: article.teaser %}
+        {% endif %}
+        {% if article.header.teaser %}
+          {% assign candidates = candidates | push: article.header.teaser %}
+        {% endif %}
+        {% if article.header.header %}
+          {% assign candidates = candidates | push: article.header.header %}
+        {% endif %}
+        {% if article.header.og_image %}
+          {% assign candidates = candidates | push: article.header.og_image %}
+        {% endif %}
+        {% if article.content contains "<img" %}
+          {% assign scraped = article.content | split: 'src="' | shift | first | split: '"' | first %}
+          {% if scraped contains "/" %}
+            {% assign candidates = candidates | push: scraped %}
+          {% endif %}
+        {% endif %}
+        {% assign candidates = candidates | push: site.teaser %}
+
+        {% assign teaser_img = "" %}
+        {% assign found = false %}
+        {% for candidate in candidates %}
+          {% unless found %}
+            {% assign last_char = candidate | split: "" | last %}
+            {% if last_char != "/" and last_char != "" %}
+              {% assign teaser_img = candidate %}
+              {% assign found = true %}
+            {% endif %}
+          {% endunless %}
+        {% endfor %}
+
+        {% if teaser_img == "" %}
+          {% assign teaser_img = site.teaser %}
+        {% endif %}
+
+        <div class="archive__item-teaser">
+          <img src="{{ teaser_img }}" alt="{{ article.title | escape }}">
+        </div>
+
+        <div class="archive__item-body">
+          <h2 class="archive__item-title">
+            <a href="{{ article.url }}" rel="permalink">{{ article.title }}</a>
+          </h2>
+
+          {% assign excerpt_text = article.excerpt %}
+          {% if excerpt_text == "" or excerpt_text == nil %}
+            {% assign excerpt_text = article.content | markdownify | strip_html | strip_newlines | truncatewords: 25 %}
+          {% endif %}
+          <p>{{ excerpt_text }}</p>
+
+          <p>
+            <a href="{{ article.url }}" class="read-more btn btn--primary">Read More</a>
+          </p>
+        </div>
+
+      </div>
+    </div>
+  {% endfor %}
+</div>

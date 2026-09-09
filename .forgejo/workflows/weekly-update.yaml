@@ -1,0 +1,110 @@
+name: Weekly dependency update
+
+on:
+  schedule:
+    - cron: "0 13 * * 1"   # Mondays, 09:00 EDT
+  workflow_dispatch:
+
+env:
+  BRANCH: chore/weekly-bundle-update
+  BASE: main
+
+jobs:
+  update-and-build:
+    runs-on: docker
+    container:
+      image: ruby:4.0
+    steps:
+      - name: Install system packages
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends git jq curl ca-certificates
+
+      - name: Checkout default branch
+        uses: https://data.forgejo.org/actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.UPDATE_TOKEN }}
+
+      - name: Install gem dependencies
+        run: |
+          git config --global user.name "forgejo-bot"
+          git config --global user.email "no-reply@turnerservices.cloud"
+          bundle config set --local path vendor/bundle
+          bundle install
+
+      - name: Update all gems
+        run: bundle update --all
+
+      - name: Detect lockfile changes
+        run: |
+          if git diff --quiet -- Gemfile.lock; then
+            echo "LOCK_CHANGED=false" >> "$GITHUB_ENV"
+          else
+            echo "LOCK_CHANGED=true" >> "$GITHUB_ENV"
+          fi
+
+      - name: Build site (log captured, never fails the job)
+        if: env.LOCK_CHANGED == 'true'
+        run: |
+          set +e
+          bundle exec jekyll build > build.log 2>&1
+          EXIT_CODE=$?
+          set -e
+          echo "Jekyll exited with code $EXIT_CODE"
+          if [ "$EXIT_CODE" -eq 0 ]; then
+            echo "BUILD_RESULT=succeeded" >> "$GITHUB_ENV"
+          else
+            echo "BUILD_RESULT=FAILED" >> "$GITHUB_ENV"
+          fi
+
+      - name: Push update branch
+        if: env.LOCK_CHANGED == 'true'
+        run: |
+          git checkout -B "$BRANCH"
+          git add Gemfile.lock
+          git commit -m "Weekly bundle update $(date -u +%Y-%m-%d)"
+          REPO_TARGET=$(echo "${{ github.server_url }}/${{ github.repository }}.git" | sed 's#^https\?://##')
+          git push "https://forgejo-bot:${TOKEN}@${REPO_TARGET}" "HEAD:${BRANCH}"
+        env:
+          TOKEN: ${{ secrets.UPDATE_TOKEN }}
+
+      - name: Open PR with build log
+        if: env.LOCK_CHANGED == 'true'
+        run: |
+          {
+            echo "## Weekly bundle update — $(date -u +%Y-%m-%d)"
+            echo
+            if [ "$BUILD_RESULT" = "succeeded" ]; then
+              echo "### ✅ Build succeeded"
+              echo
+              echo "Review the deprecation warnings in the log excerpt below before merging."
+            else
+              echo "### ❌ Build FAILED — do not merge until resolved"
+              echo
+              echo "Reproduce locally with \`bundle update --all && bundle exec jekyll build\` and fix before merging."
+            fi
+            echo
+            echo '```'
+            echo "===== first 100 lines ====="
+            head -n 100 build.log
+            echo "===== last 100 lines ====="
+            tail -n 100 build.log
+            echo '```'
+          } > pr-body.md
+
+          jq -n \
+            --arg title "Weekly bundle update $(date -u +%Y-%m-%d) [$BUILD_RESULT]" \
+            --arg body "$(cat pr-body.md)" \
+            --arg head "$BRANCH" \
+            --arg base "$BASE" \
+            '{title: $title, body: $body, head: $head, base: $base}' > payload.json
+
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" -X POST \
+            -H "Authorization: token $TOKEN" \
+            -H "Content-Type: application/json" \
+            -d @payload.json \
+            "${{ github.api_url }}/repos/${{ github.repository }}/pulls")
+          echo "PR creation returned HTTP $HTTP_CODE (409 means the PR already exists and was refreshed by the push)"
+        env:
+          TOKEN: ${{ secrets.UPDATE_TOKEN }}

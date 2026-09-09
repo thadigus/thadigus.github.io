@@ -18,7 +18,7 @@ jobs:
       - name: Install system packages
         run: |
           apt-get update
-          apt-get install -y --no-install-recommends git jq curl ca-certificates
+          apt-get install -y --no-install-recommends git jq curl ca-certificates nodejs
 
       - name: Checkout default branch
         uses: https://data.forgejo.org/actions/checkout@v4

@@ -1,0 +1,70 @@
+name: Build and deploy Jekyll site to Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+env:
+  BASE: main
+
+jobs:
+  build:
+    if: github.server_url == 'https://github.com'
+    runs-on: ubuntu-latest
+    container:
+      image: ruby:4.0
+    steps:
+      - name: Install system packages
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends git nodejs
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure Bundler
+        run: bundle config set --local path vendor/bundle
+
+      - name: Cache gems
+        uses: actions/cache@v4
+        with:
+          path: vendor/bundle
+          key: gems-${{ runner.os }}-${{ hashFiles('Gemfile.lock') }}
+          restore-keys: gems-${{ runner.os }}-
+
+      - name: Install gem dependencies
+        run: bundle install
+
+      - name: Setup Pages
+        id: pages
+        uses: actions/configure-pages@v5
+
+      - name: Build with Jekyll
+        run: bundle exec jekyll build --baseurl "${{ steps.pages.outputs.base_path }}"
+        env:
+          JEKYLL_ENV: production
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+
+  deploy:
+    needs: build
+    if: github.server_url == 'https://github.com'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

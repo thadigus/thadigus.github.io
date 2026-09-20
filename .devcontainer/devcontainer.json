@@ -13,7 +13,8 @@
       }
     }
   },
-  "appPort": [4000, 35729],
-  "postCreateCommand": "git config --global --add safe.directory /workspaces/thadigus.github.io && bundle exec jekyll serve -H 0.0.0.0 --port 4000 --livereload",
+  "forwardPorts": [4000, 35729],
+  "postCreateCommand": "git config --global --add safe.directory /workspaces/thadigus-blog && bundle install",
+  "postStartCommand": "nohup bundle exec jekyll serve -H 0.0.0.0 -P 4000 --livereload > /tmp/jekyll.log 2>&1 < /dev/null &",
   "remoteUser": "root"
 }
